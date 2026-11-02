@@ -1,4 +1,4 @@
-# 一方水域 · VEX AIM 互动装置 V3
+# 一方水域 · VEX AIM 互动装置 V4
 
 浏览器模拟原型：GPU 高度场湖面、90 条群游鱼、四个岸边投影装置和视觉驱动巡湖机器人。开关、Tag 观测、机器人和 Kicker 均为模拟。
 
@@ -22,9 +22,9 @@ npm run dev
 
 ## 水面、鱼群与回头检查
 
-水面采用独立 Three.js/WebGL2 画布，在 256 级网格上用两个 FBO 交替更新高度与速度；四邻域离散波动方程负责传播、叠加及阻尼，显示 shader 读取高度差生成法线、高光和轻微折射。普通鱼、浮出水面的鱼及机器人共用 `ripple.emit({x,y,radius,strength,direction,type,sourceId})`。事件队列最多 64 个，单步最多处理 12 个，幅度上限 0.035。鱼浮出与机器人冲刺还会在同一事件处生成少量气泡。灯光只影响照明与趋光。无 WebGL2 时显示原 Canvas 2D 湖面。水面由同一固定 60 Hz 时钟驱动，暂停、重置、resize、后台恢复和 context 恢复均纳入生命周期。没有每帧 GPU 到 CPU 的回读。
+水面采用独立 Three.js/WebGL2 画布，在 256 级网格上用两个 FBO 交替更新高度与速度；四邻域离散波动方程负责传播、叠加及阻尼。V4 增加一次上传的程序化水底纹理、深浅与水草阴影、缓慢的多尺度起伏、由法线驱动的水底折射、独立低分辨率动态焦散通道、太阳高光及波峰方向性明暗。焦散随水面高度场和灯光变化；灯光不注入物理波纹。普通鱼、破水鱼及机器人共用 `ripple.emit({x,y,radius,strength,direction,type,sourceId})`。事件队列最多 64 个，单步最多处理 12 个，默认事件幅度上限 0.035。尾流后方的少量接触泡沫、鱼破水时的气泡和有重力的抛射水滴由同一事件触发。无 WebGL2 或半浮点目标支持时显示 Canvas 2D 降级湖面。水面由同一固定 60 Hz 时钟驱动，暂停、重置、resize、后台恢复和 context 恢复均纳入生命周期。生产渲染没有每帧 GPU 到 CPU 回读。
 
-鱼群仍由 CPU Boids 维护默认 90 条，加入种子可复现的个体差异、速度变化、短暂停留、趋光目标滞后及低频浮出。单次最多两条同时浮出；普通游动仅间歇产生弱扰动。
+鱼群仍由 CPU Boids 维护默认 90 条，加入种子可复现的个体差异、速度变化、短暂停留和趋光目标滞后。浮出鱼经历上浮、短暂破水、下潜，身体随深度改变尺寸、明暗和背部高光；尾鳍按游速摆动，转弯时身体弯曲，停留时胸鳍继续活动。单次最多两条同时浮出；普通游动仅间歇产生弱扰动。水草和鱼群的微小漂移共用同一流向。
 
 完整状态顺序为 PATROL → DETECT → LOCK → ALIGN → APPROACH → STOP → KICK → VERIFY_OFF → RETREAT → LOOK_BACK → TURN_BACK → RETURN → RESUME → PATROL。
 
@@ -34,6 +34,8 @@ npm run dev
 
 打开调试模式，点击“运行完整交互”。等状态变为 LOOK_BACK 时再次打开西湾，观察回头结果显示“Tag 再次出现，重新锁定”；保持关闭则显示“连续确认 Tag 已消失”。
 
+展开“视觉效果测试”可重复触发强波纹、交叉波纹、鱼浮出、加速尾流、停止冲击波与西湾灯光。其按钮调用正式场景的事件与鱼群代码；水面质量、波纹、焦散、尾流、水花和浮出频率滑杆仅在调试页出现。
+
 展开“模拟参数”可修改 FOV、识别距离、W_slow、W_stop，点击“应用模拟参数”。仅在 PATROL 时接受修改，任务中会给出提示。参数改变保留固定 Kicker 行程，停止点过远而无法触碰时按失败重试处理。重置清除场景状态并保留当前调试参数，刷新恢复配置默认值。
 
 ## 模块与模拟参数
@@ -42,7 +44,7 @@ npm run dev
 - `src/adapters/vision.ts` 独立判断 ON、板面可见侧、视野、距离与圆形遮挡体，并输出 Tag ID、bearing、width 和距离。
 - `src/adapters/mock.ts` 处理全向运动和 Kicker 伸出、接触、收回时序。触碰检查包含前向距离、横向误差和静止条件。
 - `src/core/engine.ts` 负责状态机、识别锁定、接近与回程，保留代次保护与任务标识。
-- `src/visual/water.ts` 负责 GPU 高度场；`ripple.ts` 负责统一事件与限幅；`lake.ts` 保留 Canvas 2D 前景及 GSAP 灯光。复用来源和 MIT 版权见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。
+- `src/visual/water.ts` 负责 GPU 高度场及焦散通道；`waterOptics.ts` 负责俯视光学 Shader；`lakeBed.ts` 生成水底纹理；`ripple.ts` 负责统一事件与限幅；`lake.ts` 保留 Canvas 2D 前景、粒子及 GSAP 灯光。参考审计见 [visual_reference_audit.md](docs/visual_reference_audit.md)，代码改编版权见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。
 - `src/views/` 绘制岸边集成装置、调试面板、竖直板投影预览及跨窗口同步。
 
 默认 W_slow=70、W_stop=100、widthScale=7.6、FOV=100°、recognitionRange=0.85、扫描速度 32°/s、Kicker 中心到触点 reach=0.054。机器人半径 0.028，短柱从前端 0.028 伸到 0.054；停止中心距约 0.075 到板面，拨杆距岸边 0.025。width 根据平面距离计算，停止要求 bearing≤3°。这些均为演示参数，尚未标定实物。tagPose.z 仅表达竖直板高度，视觉传感器使用平面 FOV，尚未建模相机俯仰、畸变和真实投影。
@@ -59,7 +61,7 @@ npm run test:e2e
 
 E2E 使用本机 Chrome 的隔离上下文及 4173 端口生产预览，不读取个人资料。实际执行结果和范围见 VALIDATION.md。`npm run test:soak` 执行 10 分钟真实时间检查，报告写入 `artifacts/soak-report.json`。
 
-对照图：[V2 1920×1080](evidence/v2-baseline-1920x1080.png) / [V3 1920×1080](evidence/v3-baseline-1920x1080.png)。水面扰动证据：[注入前](evidence/gpu-before-ripple.png) / [注入后](evidence/gpu-after-ripple.png)。交互截图：[鱼浮出](evidence/fish-surface.png)、[短 Kicker](evidence/kicker-short.png)、[机器人回程](evidence/robot-return.png)。长时测试：[数据](evidence/soak-report.json)、[末帧](evidence/soak-final.png)。截图来自本机 Chrome，V2 使用提交 `2345987` 的独立 worktree；水面截图来自暂停后的 WebGL 测试。更多三尺寸与投影截图位于本地 `artifacts/`。
+视觉对照：[V3 1920×1080](evidence/visual-v4/v3-baseline-1920x1080.png) / [V4 1920×1080](evidence/visual-v4/full-scene-1920x1080.png)。V4 细节：[单波纹](evidence/visual-v4/single-ripple.png)、[交叉波纹](evidence/visual-v4/crossing-ripples.png)、[鱼破水](evidence/visual-v4/fish-breach.png)、[方向性尾流](evidence/visual-v4/robot-wake.png)、[停靠冲击](evidence/visual-v4/robot-stop.png)、[灯关](evidence/visual-v4/caustics-lights-off.png) / [灯开](evidence/visual-v4/caustics-light-on.png)。三尺寸完整场景见 `evidence/visual-v4/`。所有 V4 画面由本机 Chrome 运行实际场景生成，并已逐张查看。V3 与 V4 预览截图处于相同 1920×1080 视口；V4 的调试场景另列。
 
 ## 实物联调仍需验证
 

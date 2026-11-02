@@ -17,9 +17,10 @@ else {
   const canvas=document.createElement('canvas');canvas.setAttribute('aria-label','自然日光湖面，四个岸边装置与巡湖机器人');root.append(canvas);
   const adapter=new MockAdapter(),engine=new Engine(adapter),lake=new Lake(canvas,debug);
   Object.assign(window,{lakeDiagnostics:()=>lake.water.diagnostics});
-  if(debug)Object.assign(window,{lakeTestWater:lake.water,lakeFishSurface:()=>lake.school.fish.filter(f=>f.surfaceTimer>0).length});
+  if(debug)Object.assign(window,{lakeTestWater:lake.water,lakeFishSurface:()=>lake.school.fish.filter(f=>f.surfaceTimer>0).length,
+    lakeVisualState:()=>({surface:lake.school.fish.filter(f=>f.surfaceTimer>0).map(f=>({x:f.x,y:f.y,depth:f.depth,visual:f.surfaceVisual,breach:f.breach})),particles:lake.particleCount})});
   const reset=()=>{engine.reset();lake.reset();};
-  const update=debug?debugPanel(root,engine,adapter,reset,()=>void fullscreen()):()=>{};
+  const update=debug?debugPanel(root,engine,adapter,lake,reset,()=>void fullscreen()):()=>{};
   const updateDevices=deviceViews(root,engine.devices,debug,id=>engine.setSwitch(id,!engine.devices.find(d=>d.id===id)!.on));
   const caption=document.createElement('div');caption.className='scene-caption';caption.innerHTML='<span>VEX AIM · INTERACTIVE ECOSYSTEM</span><h2>一方水域</h2><p>拨动岸边开关，观察光、鱼群与巡湖机器人的相遇。</p>';root.append(caption);
   const controls=document.createElement('div');controls.className='scene-controls';

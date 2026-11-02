@@ -1,6 +1,6 @@
 # Third-party water simulation attribution
 
-The V3 height-field ping-pong update and cosine drop profile in `src/visual/water.ts` are adapted from [jeantimex/threejs-water](https://github.com/jeantimex/threejs-water), specifically `Water.ts`, `WaveSimulation.frag`, and `WaterRipple.frag`. The 2D lake renderer and integration are original to this project. No AGPL RippleAquarium source or unlicensed boids/ripple shaders were copied.
+The V3 height-field ping-pong update and cosine drop profile in `src/visual/water.ts` are adapted from [jeantimex/threejs-water](https://github.com/jeantimex/threejs-water), specifically `Water.ts`, `WaveSimulation.frag`, and `WaterRipple.frag`. V4 also adapts the refraction and screen-space light-area focusing mechanism examined in its `WaterSurfacePass.ts`, `CausticsPass.ts`, `WaterAbove.frag`, and `Caustics.frag` into the original top-down `src/visual/waterOptics.ts` shader. The lake bed, 2D rendering integration, fish, and particles are original to this project. The other V4 sources were studied for algorithms and design principles without copying files or shaders; see [visual_reference_audit.md](docs/visual_reference_audit.md). No AGPL RippleAquarium source or unlicensed boids/ripple shaders were copied.
 
 MIT License
 

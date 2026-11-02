@@ -1,0 +1,35 @@
+{
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "stats": {
+    "elapsedMs": 10233.29999998808,
+    "callbacks": 1644,
+    "medianMs": 5,
+    "p95Ms": 5.100000000000364,
+    "maxMs": 1005,
+    "heapBytes": 8219867,
+    "diagnostics": {
+      "webgl2": true,
+      "grid": [
+        512,
+        256
+      ],
+      "causticGrid": [
+        799,
+        393
+      ],
+      "quality": "auto",
+      "queue": 0,
+      "error": "",
+      "gpuMemory": {
+        "geometries": 1,
+        "textures": 4
+      }
+    },
+    "webglError": 0,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36"
+  },
+  "errors": []
+}

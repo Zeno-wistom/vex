@@ -13,7 +13,8 @@ describe('V3 水面事件与生态',()=>{
     const events=bus.drain(12);expect(events).toHaveLength(12);expect(events[0].radius).toBe(.08);expect(events[0].strength).toBe(.035);
     bus.clear();expect(bus.length).toBe(0);});
   it('速度尾流有方向，冲刺触发短冲击，停下仅产生一次停靠波纹',()=>{
-    const moving=robotMotionRipples({x:.5,y:.5,speed:.02},{x:.51,y:.5,speed:.09});expect(moving.map(e=>e.type)).toEqual(['wake','impact']);expect(moving[0].direction).toBe(0);
+    const moving=robotMotionRipples({x:.5,y:.5,speed:.02},{x:.51,y:.5,speed:.09});expect(moving.map(e=>e.type)).toEqual(['wake','wake','impact']);expect(moving[0].direction).toBe(0);
+    expect(moving[1].x).toBeLessThan(moving[0].x);expect(moving[1].strength).toBeLessThan(0);
     const stopped=robotMotionRipples({x:.51,y:.5,speed:.09},{x:.51,y:.5,speed:0});expect(stopped.map(e=>e.type)).toEqual(['dock']);
     expect(robotMotionRipples({x:.51,y:.5,speed:0},{x:.51,y:.5,speed:0})).toEqual([]);
   });
