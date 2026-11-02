@@ -16,6 +16,8 @@ else {
   const debug=params.get('debug')==='1';root.className=debug?'lake debug-mode':'lake';
   const canvas=document.createElement('canvas');canvas.setAttribute('aria-label','自然日光湖面，四个岸边装置与巡湖机器人');root.append(canvas);
   const adapter=new MockAdapter(),engine=new Engine(adapter),lake=new Lake(canvas,debug);
+  Object.assign(window,{lakeDiagnostics:()=>lake.water.diagnostics});
+  if(debug)Object.assign(window,{lakeTestWater:lake.water,lakeFishSurface:()=>lake.school.fish.filter(f=>f.surfaceTimer>0).length});
   const reset=()=>{engine.reset();lake.reset();};
   const update=debug?debugPanel(root,engine,adapter,reset,()=>void fullscreen()):()=>{};
   const updateDevices=deviceViews(root,engine.devices,debug,id=>engine.setSwitch(id,!engine.devices.find(d=>d.id===id)!.on));
@@ -31,5 +33,6 @@ else {
   },()=>lake.draw(snapshot));
   // Only one controlling lake tab may own this origin's simulation.
   const start=()=>{publish(()=>engine.snapshot());clock.start();update(snapshot);};
-  if(navigator.locks){void navigator.locks.request('vex-aim-lake-controller',{ifAvailable:true},async lock=>{if(!lock){root.innerHTML='<div class="connection">已有湖面控制页开启。请关闭另一控制页后刷新，或打开 <a href="/?view=projector">投影预览</a>。</div>';return;}start();await new Promise<void>(resolve=>window.addEventListener('pagehide',()=>resolve(),{once:true}));});}else start();
+  window.addEventListener('pagehide',()=>{clock.stop();lake.dispose();},{once:true});
+  if(navigator.locks){void navigator.locks.request('vex-aim-lake-controller',{ifAvailable:true},async lock=>{if(!lock){lake.dispose();root.innerHTML='<div class="connection">已有湖面控制页开启。请关闭另一控制页后刷新，或打开 <a href="/?view=projector">投影预览</a>。</div>';return;}start();await new Promise<void>(resolve=>window.addEventListener('pagehide',()=>resolve(),{once:true}));});}else start();
 }

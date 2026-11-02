@@ -1,5 +1,6 @@
-import { devices as defaults, home, patrol, simulation, type DeviceConfig, type Point, type SimulationConfig } from '../config/scene';
+import { devices as defaults, home, simulation, type DeviceConfig, type Point, type SimulationConfig } from '../config/scene';
 import { angle } from './math';
+import { randomSeed } from '../visual/fish';
 import type { HardwareAdapter } from '../adapters/hardware';
 import type { Device, KickResult, Observation, RobotState, Snapshot, SwitchInput } from './types';
 export class Engine {
@@ -17,7 +18,8 @@ export class Engine {
   private relocks = 0;
   private retreatDistance = 0;
   private returnPoint: Point = {...home}; private stable=0; private kickConfirmed=false;
-  private elapsed=0; private lost=0; private waypoint=1; private taskId=0; private generation=0;
+  private elapsed=0; private lost=0; private taskId=0; private generation=0;
+  private patrolTarget:Point={...home};private patrolPause=0;private patrolRandom=randomSeed(simulation.patrolSeed);
   constructor(readonly adapter: HardwareAdapter, readonly config: SimulationConfig={...simulation}, private definitions: DeviceConfig[]=defaults) {
     if(!(config.wSlow>0 && config.wStop>config.wSlow)) throw Error('需要 0 < W_slow < W_stop');
     if(new Set(definitions.map(d=>d.id)).size!==definitions.length || new Set(definitions.map(d=>d.tagId)).size!==definitions.length) throw Error('装置 ID 和 Tag ID 必须唯一');
@@ -56,6 +58,22 @@ export class Engine {
     this.adapter.command({type:'drive',speed:Math.min(speed,distance*4),turn,direction});
     return distance<.006;
   }
+  private wander(dt:number){
+    const e=this.config.ellipse,p=this.adapter.pose;
+    const outside=((p.x-e.x)/e.rx)**2+((p.y-e.y)/e.ry)**2>1;
+    if(outside)this.patrolTarget={x:e.x,y:e.y};
+    else if(Math.hypot(p.x-this.patrolTarget.x,p.y-this.patrolTarget.y)<.025){
+      if(this.patrolPause<=0)this.patrolPause=.2+this.patrolRandom()*.8;
+      const a=this.patrolRandom()*Math.PI*2,r=Math.sqrt(this.patrolRandom())*.93;
+      this.patrolTarget={x:e.x+Math.cos(a)*r*e.rx,y:e.y+Math.sin(a)*r*e.ry};
+    }
+    if(this.patrolPause>0){this.patrolPause-=dt;this.adapter.command({type:'drive',speed:0,turn:this.config.scanSpeed*.6});return;}
+    const dist=Math.hypot(p.x-this.patrolTarget.x,p.y-this.patrolTarget.y);
+    const targetSpeed=Math.min(this.config.speed*.65,Math.max(.012,dist*.28));
+    const speed=Math.min(targetSpeed,p.speed+.09*dt);
+    const direction=Math.atan2(this.patrolTarget.y-p.y,this.patrolTarget.x-p.x)*180/Math.PI;
+    this.adapter.command({type:'drive',speed,turn:this.config.scanSpeed,direction});
+  }
 
   private turnToward(point: Point) {
     const pose = this.adapter.pose;
@@ -89,9 +107,11 @@ export class Engine {
     this.lost=0;
     switch(this.state){
       case 'PATROL': {
-        if(this.goTo(patrol[this.waypoint],this.config.speed*.7))this.waypoint=(this.waypoint+1)%patrol.length;
-        const next=this.devices.find(d=>!d.fault && this.adapter.observe(d,this.time).visible);
-        if(next && this.adapter.observe(next,this.time).visible){this.relocks=0;this.lookBackResult='尚未检查';this.returnPoint={x:this.adapter.pose.x,y:this.adapter.pose.y};this.stable=0;this.targetId=next.id;this.generation=next.generation;this.taskId++;this.attempts=0;this.message=`发现 ${next.name} · Tag ${next.tagId}`;this.transition('DETECT');}break;
+        this.wander(dt);
+        const visible=this.devices.filter(d=>!d.fault).map(d=>({device:d,obs:this.adapter.observe(d,this.time)})).filter(v=>v.obs.visible);
+        visible.sort((a,b)=>Math.abs(a.obs.bearing)-Math.abs(b.obs.bearing)||a.obs.distance-b.obs.distance);
+        const next=visible[0]?.device;
+        if(next){this.relocks=0;this.lookBackResult='尚未检查';this.returnPoint={x:this.adapter.pose.x,y:this.adapter.pose.y};this.stable=0;this.targetId=next.id;this.generation=next.generation;this.taskId++;this.attempts=0;this.message=`发现 ${next.name} · Tag ${next.tagId}`;this.transition('DETECT');}break;
       }
       case 'DETECT': if(this.elapsed>=this.config.detectTime)this.transition('LOCK');break;
       case 'LOCK': if(this.elapsed>=this.config.lockTime)this.transition('ALIGN');break;
@@ -116,7 +136,11 @@ export class Engine {
             y: device.tagPose.y + offsetY / offsetLength * stoppingDistance,
           };
           const direction = Math.atan2(destination.y-this.adapter.pose.y,destination.x-this.adapter.pose.x)*180/Math.PI;
-          this.adapter.command({type:'drive',speed:obs.width>=this.config.wSlow?this.config.slowSpeed:this.config.speed,turn:obs.bearing*3,direction});
+          const distance=Math.hypot(destination.x-this.adapter.pose.x,destination.y-this.adapter.pose.y);
+          const desired=Math.min(this.config.speed,Math.max(.006,Math.min(distance*1.3,obs.width>=this.config.wSlow?this.config.slowSpeed:this.config.speed)));
+          const current=this.adapter.pose.speed;
+          const speed=Math.max(0,Math.min(desired,current+.16*dt));
+          this.adapter.command({type:'drive',speed,turn:obs.bearing*3,direction});
         }break;
       }
       case 'STOP': if(this.elapsed>=this.config.stopTime && this.adapter.pose.speed===0)this.transition('KICK');break;
@@ -183,6 +207,6 @@ export class Engine {
       case 'RESUME': if(this.elapsed>=this.config.resumeTime){this.targetId=null;this.observation=null;this.message='模拟巡逻中';this.transition('PATROL');}break;
     }
   }
-  reset(){this.lookBackResult='尚未检查';this.relocks=0;this.lookSamples=0;this.retreatDistance=0;this.returnPoint={...home};this.stable=0;this.kickConfirmed=false;this.taskId++;this.adapter.reset();this.devices=this.definitions.map(d=>({...d,on:false,generation:0,fault:null}));this.queue=[];this.targetId=null;this.observation=null;this.time=0;this.paused=false;this.completed=0;this.attempts=0;this.waypoint=1;this.history=[];this.message='模拟巡逻中';this.transition('PATROL');}
-  snapshot():Snapshot{return structuredClone({time:this.time,paused:this.paused,state:this.state,targetId:this.targetId,devices:this.devices,queue:this.queue,pose:this.adapter.pose,observation:this.observation,attempts:this.attempts,completed:this.completed,message:this.message,history:this.history,source:'mock',kicker:this.adapter.kicker,patrolWaypoint:this.waypoint,fov:this.config.fov,recognitionRange:this.config.recognitionRange,lookBackResult:this.lookBackResult});}
+  reset(){this.lookBackResult='尚未检查';this.relocks=0;this.lookSamples=0;this.retreatDistance=0;this.returnPoint={...home};this.stable=0;this.kickConfirmed=false;this.taskId++;this.adapter.reset();this.devices=this.definitions.map(d=>({...d,on:false,generation:0,fault:null}));this.queue=[];this.targetId=null;this.observation=null;this.time=0;this.paused=false;this.completed=0;this.patrolRandom=randomSeed(this.config.patrolSeed);this.patrolTarget={...home};this.patrolPause=0;this.history=[];this.message='模拟巡逻中';this.transition('PATROL');}
+  snapshot():Snapshot{return structuredClone({time:this.time,paused:this.paused,state:this.state,targetId:this.targetId,devices:this.devices,queue:this.queue,pose:this.adapter.pose,observation:this.observation,attempts:this.attempts,completed:this.completed,message:this.message,history:this.history,source:'mock',kicker:this.adapter.kicker,patrolWaypoint:0,fov:this.config.fov,recognitionRange:this.config.recognitionRange,lookBackResult:this.lookBackResult});}
 }

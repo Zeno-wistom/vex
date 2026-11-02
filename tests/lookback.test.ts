@@ -38,5 +38,5 @@ it('参数合法性与任务中更新保护',()=>{
 });
 it('改变停止 width 后仍能停靠并关闭，Kicker 行程保持固定',()=>{
  const adapter=new MockAdapter(),e=new Engine(adapter);e.updateParameters({fov:100,recognitionRange:.85,wSlow:80,wStop:120});e.setSwitch('lamp-1',true);
- until(e,()=>e.completed===1&&e.state==='PATROL');expect(e.devices[0].kickerReach).toBe(.105);
+ until(e,()=>e.completed===1&&e.state==='PATROL');expect(e.devices[0].kickerReach).toBe(.054);
 });

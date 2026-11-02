@@ -1,6 +1,6 @@
-# 一方水域 · VEX AIM 互动装置 V2
+# 一方水域 · VEX AIM 互动装置 V3
 
-现有浏览器原型的视觉与交互重构。明亮黄昏湖面、90 条群游鱼、四个岸边投影装置和视觉驱动巡湖机器人。开关、Tag 观测、机器人和 Kicker 均为模拟。
+浏览器模拟原型：GPU 高度场湖面、90 条群游鱼、四个岸边投影装置和视觉驱动巡湖机器人。开关、Tag 观测、机器人和 Kicker 均为模拟。
 
 ## 运行与使用
 
@@ -16,11 +16,15 @@ npm run dev
 
 ## 完整交互
 
-开关 ON → 投影模块与板面 Tag 亮起 → 湖面边缘光区渐亮、鱼群聚集 → 机器人巡逻扫描，摄像头看到 Tag 后锁定 → 连续转向瞄准 → 根据 width 接近与减速 → 连续六帧达到停止阈值且对准 → 静止 → Kicker 伸出并检查底部拨杆接触 → OFF → Tag 消失、光区渐暗、鱼群散开 → Kicker 收回 → 掉头离开 → 返回途中停下回望 → 连续六次检查 → Tag 消失则转回并返回任务前位置 → 继续矩形巡逻。Tag 重新亮起时重新锁定、瞄准、接近和关闭。
+开关 ON → 投影模块与板面 Tag 亮起 → 湖面边缘光区渐亮、鱼群聚集 → 机器人在中央椭圆内自然巡逻扫描，摄像头看到 Tag 后锁定 → 连续转向瞄准 → 根据 width 接近与减速 → 连续六帧达到停止阈值且对准 → 静止 → 短柱 Kicker 伸出并检查底部拨杆接触 → OFF → Tag 消失、光区渐暗、鱼群散开 → Kicker 收回 → 掉头离开 → 返回途中停下回望 → 连续六次检查 → Tag 消失则转回中央区域并继续自然巡逻。Tag 重新亮起时重新锁定、瞄准、接近和关闭。
 
-多个装置同时开启时处理首先实际看见的目标，锁定后不被其他目标打断。调试待处理列表只供观察，不作为机器人选目标的输入。Tag 丢失当帧停止位移，持续两秒取消任务。Kicker 最多尝试两次，无法触碰的目标保留 ON 并标记故障。重新 OFF→ON 清除故障。
+多个装置同时开启时处理首先实际看见的目标；同一时刻首见多个 Tag，优先视野中心较近者，锁定后不被其他目标打断。调试待处理列表只供观察，不作为机器人选目标的输入。Tag 丢失当帧停止位移，持续两秒取消任务。Kicker 最多尝试两次，无法触碰的目标保留 ON 并标记故障。重新 OFF→ON 清除故障。
 
-## V2 回头检查与调试
+## 水面、鱼群与回头检查
+
+水面采用独立 Three.js/WebGL2 画布，在 256 级网格上用两个 FBO 交替更新高度与速度；四邻域离散波动方程负责传播、叠加及阻尼，显示 shader 读取高度差生成法线、高光和轻微折射。普通鱼、浮出水面的鱼及机器人共用 `ripple.emit({x,y,radius,strength,direction,type,sourceId})`。事件队列最多 64 个，单步最多处理 12 个，幅度上限 0.035。鱼浮出与机器人冲刺还会在同一事件处生成少量气泡。灯光只影响照明与趋光。无 WebGL2 时显示原 Canvas 2D 湖面。水面由同一固定 60 Hz 时钟驱动，暂停、重置、resize、后台恢复和 context 恢复均纳入生命周期。没有每帧 GPU 到 CPU 的回读。
+
+鱼群仍由 CPU Boids 维护默认 90 条，加入种子可复现的个体差异、速度变化、短暂停留、趋光目标滞后及低频浮出。单次最多两条同时浮出；普通游动仅间歇产生弱扰动。
 
 完整状态顺序为 PATROL → DETECT → LOCK → ALIGN → APPROACH → STOP → KICK → VERIFY_OFF → RETREAT → LOOK_BACK → TURN_BACK → RETURN → RESUME → PATROL。
 
@@ -34,14 +38,14 @@ npm run dev
 
 ## 模块与模拟参数
 
-- `src/config/scene.ts` 定义装置、tagPose 高度、switchPose、approachPose、kickerReach、原矩形巡逻路线和视觉参数。位置采用归一化湖面坐标，heading 单位为度。
+- `src/config/scene.ts` 定义装置、tagPose 高度、switchPose、approachPose、kickerReach、中央巡逻椭圆和视觉参数。位置采用归一化湖面坐标，heading 单位为度。
 - `src/adapters/vision.ts` 独立判断 ON、板面可见侧、视野、距离与圆形遮挡体，并输出 Tag ID、bearing、width 和距离。
 - `src/adapters/mock.ts` 处理全向运动和 Kicker 伸出、接触、收回时序。触碰检查包含前向距离、横向误差和静止条件。
 - `src/core/engine.ts` 负责状态机、识别锁定、接近与回程，保留代次保护与任务标识。
-- `src/visual/` 复用群游动力学和 GSAP 渐变，绘制水纹、折射、植物、鱼群、机器人及摄像头视野。
+- `src/visual/water.ts` 负责 GPU 高度场；`ripple.ts` 负责统一事件与限幅；`lake.ts` 保留 Canvas 2D 前景及 GSAP 灯光。复用来源和 MIT 版权见 [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md)。
 - `src/views/` 绘制岸边集成装置、调试面板、竖直板投影预览及跨窗口同步。
 
-默认 W_slow=70、W_stop=100、widthScale=12、FOV=100°、recognitionRange=0.85、扫描速度 32°/s、Kicker reach=0.105。width 根据平面距离计算，停止要求 bearing≤3°。这些均为演示参数。tagPose.z 仅表达竖直板高度，本轮视觉传感器使用平面 FOV，尚未建模相机俯仰、畸变和真实投影。
+默认 W_slow=70、W_stop=100、widthScale=7.6、FOV=100°、recognitionRange=0.85、扫描速度 32°/s、Kicker 中心到触点 reach=0.054。机器人半径 0.028，短柱从前端 0.028 伸到 0.054；停止中心距约 0.075 到板面，拨杆距岸边 0.025。width 根据平面距离计算，停止要求 bearing≤3°。这些均为演示参数，尚未标定实物。tagPose.z 仅表达竖直板高度，视觉传感器使用平面 FOV，尚未建模相机俯仰、畸变和真实投影。
 
 装置可配置为三到四个，不要求位于边中心。修改 tagPose 或停靠偏移时，需要同时核对拨杆触碰范围与安全区。当前默认场景没有内部实体遮挡物，传感器提供 occluders 配置及遮挡回归测试。水草等显示内容不会被当成真实遮挡物。
 
@@ -53,7 +57,9 @@ npm run build
 npm run test:e2e
 ```
 
-E2E 使用本机 Chrome 的隔离上下文及 4173 端口生产预览，不读取个人资料。实际执行结果和范围见 VALIDATION.md。`npm run test:soak` 保留为 10 分钟真实时间运行检查，本轮尚未执行。
+E2E 使用本机 Chrome 的隔离上下文及 4173 端口生产预览，不读取个人资料。实际执行结果和范围见 VALIDATION.md。`npm run test:soak` 执行 10 分钟真实时间检查，报告写入 `artifacts/soak-report.json`。
+
+对照图：[V2 1920×1080](evidence/v2-baseline-1920x1080.png) / [V3 1920×1080](evidence/v3-baseline-1920x1080.png)。水面扰动证据：[注入前](evidence/gpu-before-ripple.png) / [注入后](evidence/gpu-after-ripple.png)。交互截图：[鱼浮出](evidence/fish-surface.png)、[短 Kicker](evidence/kicker-short.png)、[机器人回程](evidence/robot-return.png)。长时测试：[数据](evidence/soak-report.json)、[末帧](evidence/soak-final.png)。截图来自本机 Chrome，V2 使用提交 `2345987` 的独立 worktree；水面截图来自暂停后的 WebGL 测试。更多三尺寸与投影截图位于本地 `artifacts/`。
 
 ## 实物联调仍需验证
 
