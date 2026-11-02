@@ -41,6 +41,8 @@ approved，用户 2026-11-02 直接授权以远端 master 对应的 V2 为基线
 
 implemented，已创建目标分支；Three.js/WebGL2 水面采用双 FBO、固定步长高度场，Canvas 2D 保留前景与装置。鱼群维持 90 条 CPU Boids，新增低频浮出与弱扰动。机器人改为中央椭圆随机目标，多个 Tag 同时首见按视野中心距离选择，短 Kicker 的视觉与触碰判定使用 0.054 中心到触点行程。仍保留现有状态机、投影与调试交互。上游 MIT 署名见 THIRD_PARTY_LICENSES.md。
 
-verified，37 项单元测试、生产构建、8 项 Chrome E2E 与 10.05 分钟 HeadlessChrome soak 均通过；覆盖 1920×1080、2560×1440、2560×1080、GPU 波纹传播与恢复、无 WebGL2 降级、鱼浮出、短 Kicker、回程、双目标、回望重开与投影同步。已实际查看截图；证据与长时报告在 `evidence/`。soak 实测 rAF 回调频率 137.9–195.9/s（均值 159.9，headless 无显示器刷新限制），单窗口 p95 帧间隔 5.1–10.1 ms，3 次超过 50 ms，JS 堆首末 8.0→8.2 MB，WebGL 错误 0，资源计数 2 纹理/1 几何。此性能数据不能代表实体大屏显示帧率。待完成 GitHub 交付。
+verified，37 项单元测试、生产构建、8 项 Chrome E2E 与 10.05 分钟 HeadlessChrome soak 均通过；覆盖 1920×1080、2560×1440、2560×1080、GPU 波纹传播与恢复、无 WebGL2 降级、鱼浮出、短 Kicker、回程、双目标、回望重开与投影同步。已实际查看截图；证据与长时报告在 `evidence/`。soak 实测 rAF 回调频率 137.9–195.9/s（均值 159.9，headless 无显示器刷新限制），单窗口 p95 帧间隔 5.1–10.1 ms，3 次超过 50 ms，JS 堆首末 8.0→8.2 MB，WebGL 错误 0，资源计数 2 纹理/1 几何。此性能数据不能代表实体大屏显示帧率。
+
+delivered，核心代码与证据于提交 `8225f84` 推送至 `origin/codex/lake-ecosystem-v3`，已创建指向 `master` 的 [PR #1](https://github.com/Zeno-wistom/vex/pull/1)。未合并。下一步由用户审阅视觉与实体结构，并在真实硬件条件下标定相机、机械行程与投影映射。
 
 accepted，尚待用户核对视觉与实体尺寸；模拟几何不是实物标定。
