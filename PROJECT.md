@@ -5,7 +5,7 @@
 
 ## 有效决策
 - approved，用户 2026-11-02 粘贴的完整重构需求授权本轮本地实施、自动化测试和浏览器验证。
-- approved，保留原矩形巡逻路线，运动方向与连续 heading 分离。开关输入只更新装置状态，视觉传感器独立判定可见性。
+- superseded，V2 的矩形巡逻路线已由 2026-11-02 V3 需求替换为中央椭圆 Bounded Wander；运动方向与连续 heading 分离、开关输入只更新装置状态、视觉传感器独立判定可见性仍有效。
 - approved，配置四个岸边集成装置，分别建模 tagPose、switchPose、approachPose 和 kickerReach。识别后才使用配置的停靠偏移。
 - superseded，原夜间视觉、湖面内部装置坐标、按开启顺序选目标、仅 debug 显示机器人，由本次完整交互展示需求替换。
 - approved，W_slow=70、W_stop=100 保留为模拟图像像素。FOV、距离、几何和动作时间均须实物标定。
@@ -25,7 +25,7 @@ accepted，尚待用户对视觉及实体结构示意确认。
 下一步，用户复核本地预览的视觉与装置示意，收到实体结构图后核对几何尺寸。保留现有未提交文件，本轮无 Git 提交或推送。
 
 
-## V2 当前工作
+## V2 历史检查点
 
 approved，用户本轮明确授权在现有版本完成 V2。保留矩形巡逻、全向运动、独立视觉传感器和四装置统一开关状态。将视觉更新为明亮黄昏，新增回头检查、连续确认、再次锁定、有限重试与模拟参数编辑。
 
@@ -34,3 +34,27 @@ implemented，LOOK_BACK、TURN_BACK、RELOCK、VERIFY_OFF、RETURN 状态已落�
 verified，30 项单元测试、最终生产构建及五项 Chrome 实时页面测试全部通过。实际完成回望重开、重新锁定、再次关闭、确认熄灭并回归巡逻。已查看最终渲染截图。
 
 下一步，用户在 http://127.0.0.1:5173/ 复核 V2，调试入口为 /?debug=1。用户仍需核对实物尺寸和最终视觉。当前保持本地未提交状态。
+
+## V3 历史检查点
+
+approved，用户 2026-11-02 直接授权以远端 master 对应的 V2 为基线，实施 GPU 高度场、鱼群浮出、中央椭圆自然巡逻、短 Kicker 几何、兼容验证，并在全部通过后提交、推送 `codex/lake-ecosystem-v3` 及创建指向 master 的 PR。不得接入真实硬件，不得自动合并或 force push。
+
+implemented，已创建目标分支；Three.js/WebGL2 水面采用双 FBO、固定步长高度场，Canvas 2D 保留前景与装置。鱼群维持 90 条 CPU Boids，新增低频浮出与弱扰动。机器人改为中央椭圆随机目标，多个 Tag 同时首见按视野中心距离选择，短 Kicker 的视觉与触碰判定使用 0.054 中心到触点行程。仍保留现有状态机、投影与调试交互。上游 MIT 署名见 THIRD_PARTY_LICENSES.md。
+
+verified，37 项单元测试、生产构建、8 项 Chrome E2E 与 10.05 分钟 HeadlessChrome soak 均通过；覆盖 1920×1080、2560×1440、2560×1080、GPU 波纹传播与恢复、无 WebGL2 降级、鱼浮出、短 Kicker、回程、双目标、回望重开与投影同步。已实际查看截图；证据与长时报告在 `evidence/`。soak 实测 rAF 回调频率 137.9–195.9/s（均值 159.9，headless 无显示器刷新限制），单窗口 p95 帧间隔 5.1–10.1 ms，3 次超过 50 ms，JS 堆首末 8.0→8.2 MB，WebGL 错误 0，资源计数 2 纹理/1 几何。此性能数据不能代表实体大屏显示帧率。
+
+delivered，核心代码与证据于提交 `8225f84` 推送至 `origin/codex/lake-ecosystem-v3`，已创建指向 `master` 的 [PR #1](https://github.com/Zeno-wistom/vex/pull/1)。未合并。下一步由用户审阅视觉与实体结构，并在真实硬件条件下标定相机、机械行程与投影映射。
+
+accepted，尚待用户核对视觉与实体尺寸；模拟几何不是实物标定。
+
+## V4 当前工作
+
+approved，用户 2026-11-02 粘贴的第二轮视觉系统升级需求授权在现有 `codex/lake-ecosystem-v3` 分支和 PR #1 上直接返工、浏览器验证、提交及推送。保留 V3 交互、状态机与硬件模拟边界；不得合并或 force push。
+
+implemented，在原 GPU 高度场上增加程序化浅水底、独立动态焦散通道、折射与方向性高光；鱼群增加上浮、破水、下潜和随游速变化的身体与鳍动作；机器人按实际位移及加速形成方向性尾流、泡沫和停靠冲击。调试页增加可重复视觉触发器及质量、强度参数，展示页保持沉浸式。上游源码与许可审计见 `docs/visual_reference_audit.md` 和 `THIRD_PARTY_LICENSES.md`。
+
+verified，V4 的 40 项单元测试、生产构建与 9 项 Chrome E2E 全部通过；三尺寸截图、10.05 分钟 headless Chrome soak 及短时有头 Chrome 观察，详见 `VALIDATION.md` 和 `evidence/visual-v4/`。soak 记录的是 rAF 回调频率而非实际显示 FPS；实体大屏、其他浏览器和物理机械仍待验证。
+
+delivered，V4 代码、文档和视觉证据交付于 `origin/codex/lake-ecosystem-v3`，现有 [PR #1](https://github.com/Zeno-wistom/vex/pull/1) 指向 `master`，未合并。具体提交 SHA 以 Git 分支头为准。
+
+accepted，尚待用户审阅 V4 视觉以及实体结构和尺寸；模拟参数不能作为实物标定值。

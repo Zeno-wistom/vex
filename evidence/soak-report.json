@@ -1,0 +1,512 @@
+{
+  "browserName": "chromium",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+  "elapsedMs": 602790,
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "errors": [],
+  "samples": [
+    {
+      "time": 30928.100000023842,
+      "fps": 141.47155326986527,
+      "p50Ms": 5.099999999999909,
+      "p95Ms": 10.100000000000364,
+      "maxMs": 200.10000000000002,
+      "longFrames": 3,
+      "frames": 4316,
+      "memory": 8389229,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 61054.90000003576,
+      "fps": 140.97784918324464,
+      "p50Ms": 5.099999999998545,
+      "p95Ms": 10.099999999998545,
+      "maxMs": 20.099999999998545,
+      "longFrames": 3,
+      "frames": 8563,
+      "memory": 9138168,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 91175.19999998808,
+      "fps": 137.9468331988725,
+      "p50Ms": 5.099999999991269,
+      "p95Ms": 10.10000000000582,
+      "maxMs": 20,
+      "longFrames": 3,
+      "frames": 12718,
+      "memory": 10551951,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 121296.80000001192,
+      "fps": 144.68743463667124,
+      "p50Ms": 5.099999999991269,
+      "p95Ms": 10.10000000000582,
+      "maxMs": 35,
+      "longFrames": 3,
+      "frames": 17076,
+      "memory": 8271888,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 151415.5,
+      "fps": 146.54568513593813,
+      "p50Ms": 5,
+      "p95Ms": 10.10000000000582,
+      "maxMs": 24.89999999999418,
+      "longFrames": 3,
+      "frames": 21490,
+      "memory": 11244870,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 181540.10000002384,
+      "fps": 143.19246488248794,
+      "p50Ms": 5.099999999976717,
+      "p95Ms": 10.10000000000582,
+      "maxMs": 20.20000000001164,
+      "longFrames": 3,
+      "frames": 25803,
+      "memory": 8886808,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 211661.5,
+      "fps": 144.43009696169005,
+      "p50Ms": 5.100000000005821,
+      "p95Ms": 10.10000000000582,
+      "maxMs": 20.10000000000582,
+      "longFrames": 3,
+      "frames": 30154,
+      "memory": 8472208,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 241772.19999998808,
+      "fps": 144.1708928233383,
+      "p50Ms": 5.099999999976717,
+      "p95Ms": 10.10000000000582,
+      "maxMs": 20,
+      "longFrames": 3,
+      "frames": 34495,
+      "memory": 7645131,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 271870.6999999881,
+      "fps": 146.94205705590966,
+      "p50Ms": 5,
+      "p95Ms": 10.10000000000582,
+      "maxMs": 25.100000000034925,
+      "longFrames": 3,
+      "frames": 38918,
+      "memory": 13040935,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 301984.40000003576,
+      "fps": 142.41021315036096,
+      "p50Ms": 5.099999999976717,
+      "p95Ms": 10.099999999976717,
+      "maxMs": 20,
+      "longFrames": 3,
+      "frames": 43206,
+      "memory": 8315984,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 332106.60000002384,
+      "fps": 146.2889996116222,
+      "p50Ms": 5,
+      "p95Ms": 10.099999999976717,
+      "maxMs": 20.099999999976717,
+      "longFrames": 3,
+      "frames": 47613,
+      "memory": 10431368,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 362210.60000002384,
+      "fps": 148.11394709219664,
+      "p50Ms": 5,
+      "p95Ms": 10.099999999976717,
+      "maxMs": 20,
+      "longFrames": 3,
+      "frames": 52072,
+      "memory": 10845789,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 392326.5,
+      "fps": 146.8932557961894,
+      "p50Ms": 5,
+      "p95Ms": 10.099999999976717,
+      "maxMs": 15.099999999976717,
+      "longFrames": 3,
+      "frames": 56495,
+      "memory": 9326942,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 422434.3000000119,
+      "fps": 159.0885695975136,
+      "p50Ms": 5,
+      "p95Ms": 10.099999999976717,
+      "maxMs": 20,
+      "longFrames": 3,
+      "frames": 61286,
+      "memory": 13388989,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 452515.1999999881,
+      "fps": 195.8763572050717,
+      "p50Ms": 5,
+      "p95Ms": 5.100000000034925,
+      "maxMs": 10.400000000023283,
+      "longFrames": 3,
+      "frames": 67178,
+      "memory": 15671546,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 482590.10000002384,
+      "fps": 195.34302234724183,
+      "p50Ms": 5,
+      "p95Ms": 5.100000000034925,
+      "maxMs": 15,
+      "longFrames": 3,
+      "frames": 73053,
+      "memory": 8276047,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 512682.3000000119,
+      "fps": 194.18217830995377,
+      "p50Ms": 5,
+      "p95Ms": 5.2000000000116415,
+      "maxMs": 15,
+      "longFrames": 3,
+      "frames": 78896,
+      "memory": 17299849,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 542775.9000000358,
+      "fps": 194.64898056832976,
+      "p50Ms": 5,
+      "p95Ms": 5.100000000034925,
+      "maxMs": 20.099999999976717,
+      "longFrames": 3,
+      "frames": 84754,
+      "memory": 18719131,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 572863.6000000238,
+      "fps": 190.02635838765082,
+      "p50Ms": 5,
+      "p95Ms": 9.800000000046566,
+      "maxMs": 20.099999999976717,
+      "longFrames": 3,
+      "frames": 90471,
+      "memory": 12399609,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    },
+    {
+      "time": 602955.4000000358,
+      "fps": 195.51216010528375,
+      "p50Ms": 5,
+      "p95Ms": 5.100000000093132,
+      "maxMs": 15,
+      "longFrames": 3,
+      "frames": 96354,
+      "memory": 8647514,
+      "state": "APPROACH",
+      "water": {
+        "webgl2": true,
+        "grid": [
+          428,
+          256
+        ],
+        "queue": 0,
+        "error": "",
+        "gpuMemory": {
+          "geometries": 1,
+          "textures": 2
+        }
+      },
+      "webglError": 0
+    }
+  ]
+}
